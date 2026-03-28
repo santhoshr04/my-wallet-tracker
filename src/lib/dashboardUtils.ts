@@ -54,13 +54,16 @@ export function buildMonthlyTrend(transactions: Transaction[], monthsBack = 6) {
     });
     const income = inMonth.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
     const expense = inMonth.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
+    const savings = inMonth.filter(t => t.type === 'savings').reduce((s, t) => s + Number(t.amount), 0);
     const incomeR = Math.round(income * 100) / 100;
     const expenseR = Math.round(expense * 100) / 100;
+    const savingsR = Math.round(savings * 100) / 100;
     return {
       label: format(monthStart, 'MMM'),
       income: incomeR,
       expense: expenseR,
-      net: Math.round((incomeR - expenseR) * 100) / 100,
+      savings: savingsR,
+      net: Math.round((incomeR - expenseR - savingsR) * 100) / 100,
     };
   });
 }
@@ -78,10 +81,24 @@ export function topExpenseCategories(transactions: Transaction[], limit = 5) {
     .map(([category, amount]) => ({ category, amount }));
 }
 
-export function savingsRatePercent(income: number, expense: number): number | null {
+/** % of income remaining after expenses and savings allocations (same idea as cash left). */
+export function leftoverIncomePercent(income: number, expense: number, savingsOutflow: number): number | null {
   if (income <= 0) return null;
-  const net = income - expense;
+  const net = income - expense - savingsOutflow;
   return Math.round((net / income) * 1000) / 10;
+}
+
+export function topSavingsCategories(transactions: Transaction[], limit = 5) {
+  const byCat: Record<string, number> = {};
+  transactions
+    .filter(t => t.type === 'savings')
+    .forEach(t => {
+      byCat[t.category] = (byCat[t.category] || 0) + Number(t.amount);
+    });
+  return Object.entries(byCat)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([category, amount]) => ({ category, amount }));
 }
 
 export function avgDailyExpense(transactions: Transaction[], period: DashboardPeriod): number | null {

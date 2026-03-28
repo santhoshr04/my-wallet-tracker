@@ -6,7 +6,7 @@ interface StatCardProps {
   title: string;
   value: string;
   icon: LucideIcon;
-  variant?: 'default' | 'income' | 'expense' | 'balance';
+  variant?: 'default' | 'income' | 'expense' | 'savings' | 'balance';
   subtitle?: string;
   valueClassName?: string;
 }
@@ -26,12 +26,14 @@ export default function StatCard({
           'w-10 h-10 rounded-xl flex items-center justify-center shrink-0',
           variant === 'income' && 'bg-income/10',
           variant === 'expense' && 'bg-expense/10',
+          variant === 'savings' && 'bg-savings/10',
           (variant === 'default' || variant === 'balance') && 'bg-primary/10',
         )}>
           <Icon className={cn(
             'w-5 h-5',
             variant === 'income' && 'text-income',
             variant === 'expense' && 'text-expense',
+            variant === 'savings' && 'text-savings',
             (variant === 'default' || variant === 'balance') && 'text-primary',
           )} />
         </div>

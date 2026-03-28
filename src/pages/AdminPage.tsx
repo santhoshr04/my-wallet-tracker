@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import TransactionList from '@/components/TransactionList';
 import StatCard from '@/components/StatCard';
 import CategoryChart from '@/components/CategoryChart';
-import { Users, IndianRupee, TrendingUp, TrendingDown, Download, Eye } from 'lucide-react';
+import { Users, IndianRupee, PiggyBank, TrendingUp, TrendingDown, Download, Eye } from 'lucide-react';
 import { formatInr } from '@/lib/formatCurrency';
 import { Navigate } from 'react-router-dom';
 import PageLoader from '@/components/PageLoader';
@@ -42,6 +42,7 @@ export default function AdminPage() {
 
   const totalIncome = allTransactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
   const totalExpense = allTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
+  const totalSavings = allTransactions.filter(t => t.type === 'savings').reduce((s, t) => s + Number(t.amount), 0);
 
   const userTransactions = viewingUser
     ? allTransactions.filter(t => t.user_id === viewingUser.user_id)
@@ -85,16 +86,23 @@ export default function AdminPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <StatCard title="Total Users" value={profiles.length.toString()} icon={Users} />
         <StatCard title="Total Income" value={formatInr(totalIncome)} icon={TrendingUp} variant="income" />
         <StatCard title="Total Expenses" value={formatInr(totalExpense)} icon={TrendingDown} variant="expense" />
-        <StatCard title="Net Balance" value={formatInr(totalIncome - totalExpense)} icon={IndianRupee} />
+        <StatCard title="Total Savings" value={formatInr(totalSavings)} icon={PiggyBank} variant="savings" />
+        <StatCard
+          title="Net Balance"
+          value={formatInr(totalIncome - totalExpense - totalSavings)}
+          icon={IndianRupee}
+          subtitle="Income − expenses − savings"
+        />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         <CategoryChart transactions={allTransactions} type="expense" />
         <CategoryChart transactions={allTransactions} type="income" />
+        <CategoryChart transactions={allTransactions} type="savings" />
       </div>
 
       <Card>

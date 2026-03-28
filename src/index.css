@@ -40,6 +40,8 @@
     --income-foreground: 0 0% 100%;
     --expense: 0 72% 51%;
     --expense-foreground: 0 0% 100%;
+    --savings: 199 75% 38%;
+    --savings-foreground: 0 0% 100%;
 
     --chart-1: 153 60% 33%;
     --chart-2: 199 89% 48%;
@@ -80,6 +82,7 @@
     --border: 220 20% 18%;
     --input: 220 20% 18%;
     --ring: 153 60% 40%;
+    --savings: 199 70% 52%;
     --sidebar-background: 220 25% 10%;
     --sidebar-foreground: 220 14% 92%;
     --sidebar-primary: 153 60% 40%;
@@ -120,5 +123,11 @@
   }
   .bg-expense {
     background-color: hsl(var(--expense));
+  }
+  .text-savings {
+    color: hsl(var(--savings));
+  }
+  .bg-savings {
+    background-color: hsl(var(--savings));
   }
 }

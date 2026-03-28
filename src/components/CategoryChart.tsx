@@ -10,9 +10,15 @@ const COLORS = [
   'hsl(120, 40%, 45%)', 'hsl(0, 60%, 50%)', 'hsl(300, 40%, 50%)',
 ];
 
+const TITLES: Record<'expense' | 'income' | 'savings', string> = {
+  expense: 'Expenses by category',
+  income: 'Income by category',
+  savings: 'Savings by category',
+};
+
 interface Props {
   transactions: Transaction[];
-  type?: 'expense' | 'income';
+  type?: 'expense' | 'income' | 'savings';
 }
 
 export default function CategoryChart({ transactions, type = 'expense' }: Props) {
@@ -26,7 +32,7 @@ export default function CategoryChart({ transactions, type = 'expense' }: Props)
   if (data.length === 0) {
     return (
       <Card>
-        <CardHeader><CardTitle className="font-heading">{type === 'expense' ? 'Expenses' : 'Income'} by Category</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="font-heading">{TITLES[type]}</CardTitle></CardHeader>
         <CardContent><p className="text-muted-foreground text-sm text-center py-8">No data yet</p></CardContent>
       </Card>
     );
@@ -34,7 +40,7 @@ export default function CategoryChart({ transactions, type = 'expense' }: Props)
 
   return (
     <Card>
-      <CardHeader><CardTitle className="font-heading">{type === 'expense' ? 'Expenses' : 'Income'} by Category</CardTitle></CardHeader>
+      <CardHeader><CardTitle className="font-heading">{TITLES[type]}</CardTitle></CardHeader>
       <CardContent className="min-w-0 overflow-x-auto">
         <div className="min-h-[240px] w-full max-w-full">
           <ResponsiveContainer width="100%" height={250} minWidth={0}>

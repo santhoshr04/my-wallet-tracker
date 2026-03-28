@@ -3,7 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, Transaction } from '@/hooks/useTransactions';
+import {
+  categoriesForType,
+  Transaction,
+  TransactionType,
+} from '@/hooks/useTransactions';
 import { cn } from '@/lib/utils';
 
 interface TransactionFormProps {
@@ -14,7 +18,7 @@ interface TransactionFormProps {
 }
 
 export default function TransactionForm({ onSubmit, initial, loading, title = 'Add Transaction' }: TransactionFormProps) {
-  const [type, setType] = useState(initial?.type || 'expense');
+  const [type, setType] = useState<TransactionType>(initial?.type || 'expense');
   const [amount, setAmount] = useState(initial?.amount?.toString() || '');
   const [category, setCategory] = useState(() => (initial?.category ?? '').trim());
   const [date, setDate] = useState(initial?.date || new Date().toISOString().split('T')[0]);
@@ -23,7 +27,7 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
   const skipNextTypeClear = useRef(true);
 
   const categoryOptions = useMemo(() => {
-    const base = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+    const base = [...categoriesForType(type)];
     const c = category.trim();
     if (c && !base.includes(c)) return [...base, c];
     return base;
@@ -44,7 +48,7 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
       skipNextTypeClear.current = false;
       return;
     }
-    const valid = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+    const valid = categoriesForType(type);
     setCategory(prev => {
       const p = prev.trim();
       if (!p) return prev;
@@ -65,11 +69,11 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <Button
               type="button"
               variant={type === 'income' ? 'default' : 'outline'}
-              className={cn(type === 'income' ? 'bg-income hover:bg-income/90' : '', 'touch-manipulation')}
+              className={cn(type === 'income' ? 'bg-income hover:bg-income/90' : '', 'touch-manipulation text-xs sm:text-sm px-2')}
               onClick={() => setType('income')}
             >
               Income
@@ -77,10 +81,18 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
             <Button
               type="button"
               variant={type === 'expense' ? 'default' : 'outline'}
-              className={cn(type === 'expense' ? 'bg-expense hover:bg-expense/90' : '', 'touch-manipulation')}
+              className={cn(type === 'expense' ? 'bg-expense hover:bg-expense/90' : '', 'touch-manipulation text-xs sm:text-sm px-2')}
               onClick={() => setType('expense')}
             >
               Expense
+            </Button>
+            <Button
+              type="button"
+              variant={type === 'savings' ? 'default' : 'outline'}
+              className={cn(type === 'savings' ? 'bg-savings hover:bg-savings/90 text-white' : '', 'touch-manipulation text-xs sm:text-sm px-2')}
+              onClick={() => setType('savings')}
+            >
+              Savings
             </Button>
           </div>
           <Input

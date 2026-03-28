@@ -55,6 +55,7 @@ export default function HistoryPage() {
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="income">Income</SelectItem>
             <SelectItem value="expense">Expense</SelectItem>
+            <SelectItem value="savings">Savings</SelectItem>
           </SelectContent>
         </Select>
         <Input type="date" placeholder="From" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />

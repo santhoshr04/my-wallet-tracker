@@ -4,7 +4,7 @@ import StatCard from '@/components/StatCard';
 import TransactionList from '@/components/TransactionList';
 import CategoryChart from '@/components/CategoryChart';
 import DashboardAnalytics from '@/components/DashboardAnalytics';
-import { IndianRupee, TrendingUp, TrendingDown } from 'lucide-react';
+import { IndianRupee, PiggyBank, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatInr } from '@/lib/formatCurrency';
 import {
   DASHBOARD_PERIOD_LABEL,
@@ -23,7 +23,8 @@ export default function DashboardPage() {
 
   const totalIncome = filtered.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
   const totalExpense = filtered.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
-  const balance = totalIncome - totalExpense;
+  const totalSavings = filtered.filter(t => t.type === 'savings').reduce((s, t) => s + Number(t.amount), 0);
+  const balance = totalIncome - totalExpense - totalSavings;
 
   const recent = useMemo(() => {
     return [...filtered].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10);
@@ -54,7 +55,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Income"
           value={formatInr(totalIncome)}
@@ -70,20 +71,28 @@ export default function DashboardPage() {
           subtitle={DASHBOARD_PERIOD_LABEL[period]}
         />
         <StatCard
+          title="Savings"
+          value={formatInr(totalSavings)}
+          icon={PiggyBank}
+          variant="savings"
+          subtitle={DASHBOARD_PERIOD_LABEL[period]}
+        />
+        <StatCard
           title="Balance"
           value={formatInr(balance)}
           icon={IndianRupee}
           variant="balance"
-          subtitle={balance >= 0 ? 'Income minus expenses' : 'Spending above income'}
+          subtitle="Income − expenses − savings"
           valueClassName={balance >= 0 ? 'text-income' : 'text-expense'}
         />
       </div>
 
       <DashboardAnalytics filteredTransactions={filtered} allTransactions={transactions} period={period} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         <CategoryChart transactions={filtered} type="expense" />
         <CategoryChart transactions={filtered} type="income" />
+        <CategoryChart transactions={filtered} type="savings" />
       </div>
 
       <TransactionList

@@ -2,10 +2,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
+export type TransactionType = 'income' | 'expense' | 'savings';
+
 export interface Transaction {
   id: string;
   user_id: string;
-  type: 'income' | 'expense';
+  type: TransactionType;
   amount: number;
   category: string;
   date: string;
@@ -28,13 +30,11 @@ export const EXPENSE_CATEGORIES = [
   'Family Expenses',
   'Household Items',
   'Gifts & Donations',
+  'Gold Loan',
   'Taxes',
   'Loan Repayment',
   'Debt Payment',
   'Office Expenses',
-  'Gold Savings Plan',
-  'Chit Fund',
-  'Gold Loan',
   'Other Expenses'
 ];
 
@@ -46,7 +46,19 @@ export const INCOME_CATEGORIES = [
   'Other Income',
 ];
 
-export const CATEGORIES = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES];
+export const SAVINGS_CATEGORIES = [
+  'Gold Savings Plan',
+  'Chit Fund',
+  'Other Savings',
+];
+
+export const CATEGORIES = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES, ...SAVINGS_CATEGORIES];
+
+export function categoriesForType(t: TransactionType): readonly string[] {
+  if (t === 'income') return INCOME_CATEGORIES;
+  if (t === 'savings') return SAVINGS_CATEGORIES;
+  return EXPENSE_CATEGORIES;
+}
 
 export function useTransactions(userId?: string) {
   const { user } = useAuth();

@@ -5,8 +5,9 @@ import {
   buildMonthlyTrend,
   DashboardPeriod,
   DASHBOARD_PERIOD_LABEL,
-  savingsRatePercent,
+  leftoverIncomePercent,
   topExpenseCategories,
+  topSavingsCategories,
 } from '@/lib/dashboardUtils';
 import {
   Bar,
@@ -25,7 +26,8 @@ import { formatInr, formatInrTick } from '@/lib/formatCurrency';
 
 const COLOR_INCOME = 'hsl(153 60% 33%)';
 const COLOR_EXPENSE = 'hsl(0 72% 51%)';
-const COLOR_NET = 'hsl(199 89% 48%)';
+const COLOR_SAVINGS = 'hsl(199 75% 38%)';
+const COLOR_NET = 'hsl(280 55% 48%)';
 
 type Props = {
   filteredTransactions: Transaction[];
@@ -53,10 +55,12 @@ function Insight({ icon: Icon, label, value, hint }: { icon: LucideIcon; label: 
 export default function DashboardAnalytics({ filteredTransactions, allTransactions, period }: Props) {
   const income = filteredTransactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
   const expense = filteredTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
-  const compareData = [{ name: 'Total', income, expense }];
+  const savings = filteredTransactions.filter(t => t.type === 'savings').reduce((s, t) => s + Number(t.amount), 0);
+  const compareData = [{ name: 'Total', income, expense, savings }];
   const trend = buildMonthlyTrend(allTransactions, 6);
   const topCats = topExpenseCategories(filteredTransactions, 5);
-  const savings = savingsRatePercent(income, expense);
+  const topSavCats = topSavingsCategories(filteredTransactions, 5);
+  const leftoverPct = leftoverIncomePercent(income, expense, savings);
   const avgDaily = avgDailyExpense(filteredTransactions, period);
   const txCount = filteredTransactions.length;
 
@@ -65,12 +69,12 @@ export default function DashboardAnalytics({ filteredTransactions, allTransactio
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Insight
           icon={PiggyBank}
-          label="Savings rate"
-          value={savings == null ? '—' : `${savings}%`}
+          label="Income left %"
+          value={leftoverPct == null ? '—' : `${leftoverPct}%`}
           hint={
-            savings == null
-              ? 'Add income in this period to see savings rate'
-              : 'Share of income left after expenses'
+            leftoverPct == null
+              ? 'Add income in this period to see this'
+              : '% of income after expenses and savings'
           }
         />
         <Insight
@@ -85,11 +89,11 @@ export default function DashboardAnalytics({ filteredTransactions, allTransactio
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-w-0">
         <Card className="min-w-0 overflow-hidden">
           <CardHeader className="pb-2">
-            <CardTitle className="font-heading text-base">Income vs expense</CardTitle>
-            <CardDescription>Total for {DASHBOARD_PERIOD_LABEL[period].toLowerCase()}</CardDescription>
+            <CardTitle className="font-heading text-base">Income, expenses & savings</CardTitle>
+            <CardDescription>Totals for {DASHBOARD_PERIOD_LABEL[period].toLowerCase()}</CardDescription>
           </CardHeader>
           <CardContent className="pt-0 min-w-0">
-            <ResponsiveContainer width="100%" height={260} minWidth={0}>
+            <ResponsiveContainer width="100%" height={280} minWidth={0}>
               <BarChart data={compareData} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
@@ -97,7 +101,8 @@ export default function DashboardAnalytics({ filteredTransactions, allTransactio
                 <Tooltip formatter={(v: number) => formatInr(v)} />
                 <Legend />
                 <Bar dataKey="income" name="Income" fill={COLOR_INCOME} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="expense" name="Expense" fill={COLOR_EXPENSE} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="expense" name="Expenses" fill={COLOR_EXPENSE} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="savings" name="Savings" fill={COLOR_SAVINGS} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -106,18 +111,19 @@ export default function DashboardAnalytics({ filteredTransactions, allTransactio
         <Card className="min-w-0 overflow-hidden">
           <CardHeader className="pb-2">
             <CardTitle className="font-heading text-base">6-month cash flow</CardTitle>
-            <CardDescription>Income, spending, and net per month (all activity)</CardDescription>
+            <CardDescription>Income, spending, savings, and net (all activity)</CardDescription>
           </CardHeader>
           <CardContent className="pt-0 min-w-0">
-            <ResponsiveContainer width="100%" height={260} minWidth={0}>
+            <ResponsiveContainer width="100%" height={280} minWidth={0}>
               <LineChart data={trend} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="label" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} tickFormatter={v => formatInrTick(Number(v))} width={56} />
                 <Tooltip formatter={(v: number) => formatInr(v)} />
-                <Legend />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
                 <Line type="monotone" dataKey="income" name="Income" stroke={COLOR_INCOME} strokeWidth={2} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="expense" name="Expense" stroke={COLOR_EXPENSE} strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="savings" name="Savings" stroke={COLOR_SAVINGS} strokeWidth={2} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="net" name="Net" stroke={COLOR_NET} strokeWidth={2} dot={{ r: 3 }} strokeDasharray="4 4" />
               </LineChart>
             </ResponsiveContainer>
@@ -125,29 +131,54 @@ export default function DashboardAnalytics({ filteredTransactions, allTransactio
         </Card>
       </div>
 
-      {topCats.length > 0 ? (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="font-heading text-base">Top expense categories</CardTitle>
-            <CardDescription>{DASHBOARD_PERIOD_LABEL[period]} · by amount</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <ul className=" divide-y">
-              {topCats.map((row, i) => {
-                const pct = expense > 0 ? Math.round((row.amount / expense) * 100) : 0;
-                return (
-                  <li key={row.category} className="flex items-center justify-between gap-4 py-2.5 text-sm first:pt-0">
-                    <span className="text-muted-foreground w-6 shrink-0 font-medium">{i + 1}</span>
-                    <span className="flex-1 font-medium truncate">{row.category}</span>
-                    <span className="text-muted-foreground shrink-0">{pct}%</span>
-                    <span className="font-heading font-semibold tabular-nums shrink-0">{formatInr(row.amount)}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </CardContent>
-        </Card>
-      ) : null}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {topCats.length > 0 ? (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="font-heading text-base">Top expense categories</CardTitle>
+              <CardDescription>{DASHBOARD_PERIOD_LABEL[period]} · by amount</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <ul className="divide-y">
+                {topCats.map((row, i) => {
+                  const pct = expense > 0 ? Math.round((row.amount / expense) * 100) : 0;
+                  return (
+                    <li key={row.category} className="flex items-center justify-between gap-4 py-2.5 text-sm first:pt-0">
+                      <span className="text-muted-foreground w-6 shrink-0 font-medium">{i + 1}</span>
+                      <span className="flex-1 font-medium truncate">{row.category}</span>
+                      <span className="text-muted-foreground shrink-0">{pct}%</span>
+                      <span className="font-heading font-semibold tabular-nums shrink-0">{formatInr(row.amount)}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </CardContent>
+          </Card>
+        ) : null}
+        {topSavCats.length > 0 ? (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="font-heading text-base">Top savings categories</CardTitle>
+              <CardDescription>{DASHBOARD_PERIOD_LABEL[period]} · by amount</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <ul className="divide-y">
+                {topSavCats.map((row, i) => {
+                  const pct = savings > 0 ? Math.round((row.amount / savings) * 100) : 0;
+                  return (
+                    <li key={row.category} className="flex items-center justify-between gap-4 py-2.5 text-sm first:pt-0">
+                      <span className="text-muted-foreground w-6 shrink-0 font-medium">{i + 1}</span>
+                      <span className="flex-1 font-medium truncate">{row.category}</span>
+                      <span className="text-muted-foreground shrink-0">{pct}%</span>
+                      <span className="font-heading font-semibold tabular-nums shrink-0">{formatInr(row.amount)}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </CardContent>
+          </Card>
+        ) : null}
+      </div>
     </div>
   );
 }
