@@ -17,7 +17,7 @@ export type TransactionInsert = Omit<Transaction, 'id' | 'created_at'>;
 
 export const CATEGORIES = [
   'Food', 'Travel', 'Bills', 'Entertainment', 'Shopping', 'Health',
-  'Education', 'Salary', 'Freelance', 'Investment', 'Rent', 'Other'
+  'Education', 'Salary', 'Freelance', 'Investment', 'Rent', 'Family Expenses', 'Gifts', 'Taxes', 'Other Income', 'Household Items', 'Transportation', 'Clothing', 'Entertainment', 'Other'
 ];
 
 export function useTransactions(userId?: string) {
