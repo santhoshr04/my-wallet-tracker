@@ -28,7 +28,7 @@ export default function DashboardPage() {
     return [...filtered].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10);
   }, [filtered]);
 
-  if (isLoading) return <div className="flex items-center justify-center py-20 text-muted-foreground">Loading...</div>;
+  if (isLoading) return <div className="flex min-h-[40dvh] items-center justify-center text-muted-foreground">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -41,7 +41,7 @@ export default function DashboardPage() {
               type="button"
               onClick={() => setPeriod(p)}
               className={cn(
-                'flex-1 sm:flex-none rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                'touch-manipulation flex-1 sm:flex-none rounded-md px-2 py-2.5 text-xs font-medium transition-colors sm:px-3 sm:text-sm',
                 period === p
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground',

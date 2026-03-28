@@ -11,6 +11,7 @@ import StatCard from '@/components/StatCard';
 import CategoryChart from '@/components/CategoryChart';
 import { Users, DollarSign, TrendingUp, TrendingDown, Download, Eye } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
+import PageLoader from '@/components/PageLoader';
 
 interface Profile {
   user_id: string;
@@ -35,7 +36,7 @@ export default function AdminPage() {
 
   const { data: allTransactions = [] } = useAllTransactions();
 
-  if (loading) return null;
+  if (loading) return <PageLoader />;
   if (!isAdmin) return <Navigate to="/" replace />;
 
   const totalIncome = allTransactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
@@ -75,10 +76,10 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-heading font-bold">Admin Panel</h1>
-        <Button variant="outline" size="sm" onClick={exportAll}>
-          <Download className="w-4 h-4 mr-2" />
+        <Button variant="outline" size="sm" className="w-full touch-manipulation sm:w-auto shrink-0" onClick={exportAll}>
+          <Download className="w-4 h-4 mr-2 shrink-0" />
           Export All Data
         </Button>
       </div>
@@ -104,16 +105,16 @@ export default function AdminPage() {
             {profiles.map(p => {
               const userTxCount = allTransactions.filter(t => t.user_id === p.user_id).length;
               return (
-                <div key={p.user_id} className="flex items-center justify-between px-5 py-3 hover:bg-muted/50 transition-colors">
-                  <div>
+                <div key={p.user_id} className="flex flex-col gap-3 px-3 py-3 hover:bg-muted/50 transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                  <div className="min-w-0">
                     <p className="font-medium text-sm">{p.display_name || 'Unnamed'}</p>
-                    <p className="text-xs text-muted-foreground">{p.email} · {userTxCount} transactions</p>
+                    <p className="text-xs text-muted-foreground truncate">{p.email} · {userTxCount} transactions</p>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => setViewingUser(p)}>
+                  <div className="flex shrink-0 gap-2">
+                    <Button variant="ghost" size="sm" className="touch-manipulation flex-1 sm:flex-initial" onClick={() => setViewingUser(p)}>
                       <Eye className="w-4 h-4 mr-1" /> View
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => exportUserData(p.user_id, p.email)}>
+                    <Button variant="outline" size="sm" className="touch-manipulation" onClick={() => exportUserData(p.user_id, p.email)}>
                       <Download className="w-4 h-4" />
                     </Button>
                   </div>
@@ -125,7 +126,7 @@ export default function AdminPage() {
       </Card>
 
       <Dialog open={!!viewingUser} onOpenChange={open => !open && setViewingUser(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{viewingUser?.display_name || viewingUser?.email}'s Transactions</DialogTitle>
           </DialogHeader>

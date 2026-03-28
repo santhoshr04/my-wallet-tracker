@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Wallet } from 'lucide-react';
+import PageLoader from '@/components/PageLoader';
 
 export default function AuthPage() {
   const { user, loading } = useAuth();
@@ -16,7 +17,7 @@ export default function AuthPage() {
   const [submitting, setSubmitting] = useState(false);
   const { signIn, signUp } = useAuth();
 
-  if (loading) return null;
+  if (loading) return <PageLoader />;
   if (user) return <Navigate to="/" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +41,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-8 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
       <Card className="w-full max-w-md animate-fade-in">
         <CardHeader className="text-center space-y-2">
           <div className="mx-auto w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-2">

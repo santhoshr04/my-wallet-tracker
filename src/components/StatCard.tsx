@@ -37,7 +37,7 @@ export default function StatCard({
         </div>
         <div className="min-w-0">
           <p className="text-sm text-muted-foreground">{title}</p>
-          <p className={cn('text-xl font-heading font-bold tabular-nums', valueClassName)}>{value}</p>
+          <p className={cn('text-lg sm:text-xl font-heading font-bold tabular-nums break-words', valueClassName)}>{value}</p>
           {subtitle ? <p className="text-xs text-muted-foreground mt-1">{subtitle}</p> : null}
         </div>
       </CardContent>

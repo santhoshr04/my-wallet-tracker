@@ -37,10 +37,10 @@ export default function HistoryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-heading font-bold">Transaction History</h1>
-        <Button variant="outline" size="sm" onClick={exportJSON}>
-          <Download className="w-4 h-4 mr-2" />
+        <Button variant="outline" size="sm" className="w-full touch-manipulation sm:w-auto shrink-0" onClick={exportJSON}>
+          <Download className="w-4 h-4 mr-2 shrink-0" />
           Export JSON
         </Button>
       </div>

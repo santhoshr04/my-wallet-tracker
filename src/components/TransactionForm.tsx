@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, Transaction } from '@/hooks/useTransactions';
+import { cn } from '@/lib/utils';
 
 interface TransactionFormProps {
   onSubmit: (data: { type: string; amount: number; category: string; date: string; description: string }) => void;
@@ -42,7 +43,7 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
             <Button
               type="button"
               variant={type === 'income' ? 'default' : 'outline'}
-              className={type === 'income' ? 'bg-income hover:bg-income/90' : ''}
+              className={cn(type === 'income' ? 'bg-income hover:bg-income/90' : '', 'touch-manipulation')}
               onClick={() => setType('income')}
             >
               Income
@@ -50,7 +51,7 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
             <Button
               type="button"
               variant={type === 'expense' ? 'default' : 'outline'}
-              className={type === 'expense' ? 'bg-expense hover:bg-expense/90' : ''}
+              className={cn(type === 'expense' ? 'bg-expense hover:bg-expense/90' : '', 'touch-manipulation')}
               onClick={() => setType('expense')}
             >
               Expense
@@ -58,6 +59,7 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
           </div>
           <Input
             type="number"
+            inputMode="decimal"
             placeholder="Amount"
             required
             min="0.01"
@@ -85,7 +87,7 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
             value={description}
             onChange={e => setDescription(e.target.value)}
           />
-          <Button type="submit" className="w-full" disabled={loading || !category}>
+          <Button type="submit" className="w-full touch-manipulation" disabled={loading || !category}>
             {loading ? 'Saving...' : initial ? 'Update' : 'Add Transaction'}
           </Button>
         </form>

@@ -52,7 +52,7 @@ function Insight({ icon: Icon, label, value, hint }: { icon: LucideIcon; label: 
 export default function DashboardAnalytics({ filteredTransactions, allTransactions, period }: Props) {
   const income = filteredTransactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
   const expense = filteredTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
-  const compareData = [{ name: DASHBOARD_PERIOD_LABEL[period], income, expense }];
+  const compareData = [{ name: 'Total', income, expense }];
   const trend = buildMonthlyTrend(allTransactions, 6);
   const topCats = topExpenseCategories(filteredTransactions, 5);
   const savings = savingsRatePercent(income, expense);
@@ -81,14 +81,14 @@ export default function DashboardAnalytics({ filteredTransactions, allTransactio
         <Insight icon={Landmark} label="Transactions" value={String(txCount)} hint={`In ${DASHBOARD_PERIOD_LABEL[period].toLowerCase()}`} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-w-0">
+        <Card className="min-w-0 overflow-hidden">
           <CardHeader className="pb-2">
             <CardTitle className="font-heading text-base">Income vs expense</CardTitle>
             <CardDescription>Total for {DASHBOARD_PERIOD_LABEL[period].toLowerCase()}</CardDescription>
           </CardHeader>
-          <CardContent className="pt-0">
-            <ResponsiveContainer width="100%" height={260}>
+          <CardContent className="pt-0 min-w-0">
+            <ResponsiveContainer width="100%" height={260} minWidth={0}>
               <BarChart data={compareData} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
@@ -102,13 +102,13 @@ export default function DashboardAnalytics({ filteredTransactions, allTransactio
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0 overflow-hidden">
           <CardHeader className="pb-2">
             <CardTitle className="font-heading text-base">6-month cash flow</CardTitle>
             <CardDescription>Income, spending, and net per month (all activity)</CardDescription>
           </CardHeader>
-          <CardContent className="pt-0">
-            <ResponsiveContainer width="100%" height={260}>
+          <CardContent className="pt-0 min-w-0">
+            <ResponsiveContainer width="100%" height={260} minWidth={0}>
               <LineChart data={trend} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="label" tick={{ fontSize: 12 }} />

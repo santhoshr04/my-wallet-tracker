@@ -34,15 +34,34 @@ export default function CategoryChart({ transactions, type = 'expense' }: Props)
   return (
     <Card>
       <CardHeader><CardTitle className="font-heading">{type === 'expense' ? 'Expenses' : 'Income'} by Category</CardTitle></CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={250}>
-          <PieChart>
-            <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-              {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-            </Pie>
-            <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
-          </PieChart>
-        </ResponsiveContainer>
+      <CardContent className="min-w-0 overflow-x-auto">
+        <div className="min-h-[240px] w-full max-w-full">
+          <ResponsiveContainer width="100%" height={250} minWidth={0}>
+            <PieChart margin={{ top: 0, right: 8, bottom: 8, left: 8 }}>
+              <Pie
+                data={data}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="45%"
+                innerRadius={0}
+                outerRadius="72%"
+                paddingAngle={1}
+                label={false}
+              >
+                {data.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="hsl(var(--background))" strokeWidth={1} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+              <Legend
+                layout="horizontal"
+                verticalAlign="bottom"
+                wrapperStyle={{ fontSize: '11px', paddingTop: 8 }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

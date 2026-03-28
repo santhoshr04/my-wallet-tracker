@@ -47,7 +47,7 @@ export default function TransactionList({ transactions, title = 'Recent Transact
           ) : (
             <div className="divide-y">
               {transactions.map(tx => (
-                <div key={tx.id} className="flex items-center justify-between px-5 py-3 hover:bg-muted/50 transition-colors">
+                <div key={tx.id} className="flex items-center justify-between gap-2 px-3 py-3 sm:px-5 hover:bg-muted/50 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
                     {tx.type === 'income' ? (
                       <ArrowUpCircle className="w-5 h-5 text-income shrink-0" />

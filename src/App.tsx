@@ -11,12 +11,13 @@ import AdminPage from "./pages/AdminPage";
 import AppLayout from "./components/AppLayout";
 import NotFound from "./pages/NotFound";
 import { Navigate } from "react-router-dom";
+import PageLoader from "@/components/PageLoader";
 
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <PageLoader />;
   if (!user) return <Navigate to="/auth" replace />;
   return <AppLayout>{children}</AppLayout>;
 }
