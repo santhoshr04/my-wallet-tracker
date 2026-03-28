@@ -15,10 +15,38 @@ export interface Transaction {
 
 export type TransactionInsert = Omit<Transaction, 'id' | 'created_at'>;
 
-export const CATEGORIES = [
-  'Food', 'Travel', 'Bills', 'Entertainment', 'Shopping', 'Health',
-  'Education', 'Salary', 'Freelance', 'Investment', 'Rent', 'Family Expenses', 'Gifts', 'Taxes', 'Other Income', 'Household Items', 'Transportation', 'Clothing', 'Entertainment', 'Other'
+export const EXPENSE_CATEGORIES = [
+  'Food & Dining',
+  'Transportation',
+  'Bills & Utilities',
+  'Rent',
+  'Shopping',
+  'Clothing',
+  'Health & Medical',
+  'Education',
+  'Entertainment',
+  'Family Expenses',
+  'Household Items',
+  'Gifts & Donations',
+  'Taxes',
+  'Loan Repayment',
+  'Debt Payment',
+  'Office Expenses',
+  'Gold Savings Plan',
+  'Chit Fund',
+  'Gold Loan',
+  'Other Expenses'
 ];
+
+export const INCOME_CATEGORIES = [
+  'Salary',
+  'Packet money',
+  'Freelance',
+  'Investment',
+  'Other Income',
+];
+
+export const CATEGORIES = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES];
 
 export function useTransactions(userId?: string) {
   const { user } = useAuth();
