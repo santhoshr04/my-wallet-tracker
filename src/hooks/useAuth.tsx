@@ -23,34 +23,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<AppRole | null>(null);
 
-  const fetchRole = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .maybeSingle();
-    setRole((data?.role as AppRole) ?? 'user');
+  const applySession = async (next: Session | null) => {
+    setSession(next);
+    setUser(next?.user ?? null);
+    if (next?.user) {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', next.user.id);
+      if (error) {
+        console.error('user_roles fetch failed', error);
+        setRole('user');
+      } else {
+        const roles = (data ?? []).map(r => r.role as AppRole);
+        setRole(roles.includes('admin') ? 'admin' : 'user');
+      }
+    } else {
+      setRole(null);
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        setTimeout(() => fetchRole(session.user.id), 0);
-      } else {
-        setRole(null);
-      }
-      setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setTimeout(() => void applySession(nextSession), 0);
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchRole(session.user.id);
-      }
-      setLoading(false);
+    void supabase.auth.getSession().then(({ data: { session: s } }) => {
+      void applySession(s);
     });
 
     return () => subscription.unsubscribe();

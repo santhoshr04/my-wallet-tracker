@@ -66,6 +66,7 @@ export function useTransactions(userId?: string) {
 }
 
 export function useAllTransactions() {
+  const { isAdmin } = useAuth();
   return useQuery({
     queryKey: ['transactions', 'all'],
     queryFn: async () => {
@@ -73,6 +74,7 @@ export function useAllTransactions() {
       if (error) throw error;
       return data as Transaction[];
     },
+    enabled: isAdmin,
   });
 }
 

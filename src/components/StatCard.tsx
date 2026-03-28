@@ -6,29 +6,39 @@ interface StatCardProps {
   title: string;
   value: string;
   icon: LucideIcon;
-  variant?: 'default' | 'income' | 'expense';
+  variant?: 'default' | 'income' | 'expense' | 'balance';
+  subtitle?: string;
+  valueClassName?: string;
 }
 
-export default function StatCard({ title, value, icon: Icon, variant = 'default' }: StatCardProps) {
+export default function StatCard({
+  title,
+  value,
+  icon: Icon,
+  variant = 'default',
+  subtitle,
+  valueClassName,
+}: StatCardProps) {
   return (
-    <Card>
+    <Card className={cn(variant === 'balance' && 'border-primary/20')}>
       <CardContent className="flex items-center gap-4 p-5">
         <div className={cn(
           'w-10 h-10 rounded-xl flex items-center justify-center shrink-0',
           variant === 'income' && 'bg-income/10',
           variant === 'expense' && 'bg-expense/10',
-          variant === 'default' && 'bg-primary/10'
+          (variant === 'default' || variant === 'balance') && 'bg-primary/10',
         )}>
           <Icon className={cn(
             'w-5 h-5',
             variant === 'income' && 'text-income',
             variant === 'expense' && 'text-expense',
-            variant === 'default' && 'text-primary'
+            (variant === 'default' || variant === 'balance') && 'text-primary',
           )} />
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="text-sm text-muted-foreground">{title}</p>
-          <p className="text-xl font-heading font-bold">{value}</p>
+          <p className={cn('text-xl font-heading font-bold tabular-nums', valueClassName)}>{value}</p>
+          {subtitle ? <p className="text-xs text-muted-foreground mt-1">{subtitle}</p> : null}
         </div>
       </CardContent>
     </Card>
