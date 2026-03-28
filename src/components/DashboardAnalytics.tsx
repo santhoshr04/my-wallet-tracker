@@ -21,6 +21,7 @@ import {
   YAxis,
 } from 'recharts';
 import { Landmark, LucideIcon, PiggyBank, Receipt } from 'lucide-react';
+import { formatInr, formatInrTick } from '@/lib/formatCurrency';
 
 const COLOR_INCOME = 'hsl(153 60% 33%)';
 const COLOR_EXPENSE = 'hsl(0 72% 51%)';
@@ -75,7 +76,7 @@ export default function DashboardAnalytics({ filteredTransactions, allTransactio
         <Insight
           icon={Receipt}
           label="Avg. daily spending"
-          value={avgDaily == null ? '—' : `$${avgDaily.toFixed(2)}`}
+          value={avgDaily == null ? '—' : formatInr(avgDaily)}
           hint="Expenses ÷ days in period"
         />
         <Insight icon={Landmark} label="Transactions" value={String(txCount)} hint={`In ${DASHBOARD_PERIOD_LABEL[period].toLowerCase()}`} />
@@ -92,8 +93,8 @@ export default function DashboardAnalytics({ filteredTransactions, allTransactio
               <BarChart data={compareData} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} tickFormatter={v => `$${v}`} width={56} />
-                <Tooltip formatter={(v: number) => `$${v.toFixed(2)}`} />
+                <YAxis tick={{ fontSize: 12 }} tickFormatter={v => formatInrTick(Number(v))} width={56} />
+                <Tooltip formatter={(v: number) => formatInr(v)} />
                 <Legend />
                 <Bar dataKey="income" name="Income" fill={COLOR_INCOME} radius={[4, 4, 0, 0]} />
                 <Bar dataKey="expense" name="Expense" fill={COLOR_EXPENSE} radius={[4, 4, 0, 0]} />
@@ -112,8 +113,8 @@ export default function DashboardAnalytics({ filteredTransactions, allTransactio
               <LineChart data={trend} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} tickFormatter={v => `$${v}`} width={56} />
-                <Tooltip formatter={(v: number) => `$${v.toFixed(2)}`} />
+                <YAxis tick={{ fontSize: 12 }} tickFormatter={v => formatInrTick(Number(v))} width={56} />
+                <Tooltip formatter={(v: number) => formatInr(v)} />
                 <Legend />
                 <Line type="monotone" dataKey="income" name="Income" stroke={COLOR_INCOME} strokeWidth={2} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="expense" name="Expense" stroke={COLOR_EXPENSE} strokeWidth={2} dot={{ r: 3 }} />
@@ -139,7 +140,7 @@ export default function DashboardAnalytics({ filteredTransactions, allTransactio
                     <span className="text-muted-foreground w-6 shrink-0 font-medium">{i + 1}</span>
                     <span className="flex-1 font-medium truncate">{row.category}</span>
                     <span className="text-muted-foreground shrink-0">{pct}%</span>
-                    <span className="font-heading font-semibold tabular-nums shrink-0">${row.amount.toFixed(2)}</span>
+                    <span className="font-heading font-semibold tabular-nums shrink-0">{formatInr(row.amount)}</span>
                   </li>
                 );
               })}

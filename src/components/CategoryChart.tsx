@@ -1,4 +1,5 @@
 import { Transaction } from '@/hooks/useTransactions';
+import { formatInr } from '@/lib/formatCurrency';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
@@ -53,7 +54,7 @@ export default function CategoryChart({ transactions, type = 'expense' }: Props)
                   <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="hsl(var(--background))" strokeWidth={1} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+              <Tooltip formatter={(value: number) => formatInr(value)} />
               <Legend
                 layout="horizontal"
                 verticalAlign="bottom"

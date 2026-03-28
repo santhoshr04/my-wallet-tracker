@@ -8,6 +8,7 @@ import { Pencil, Trash2, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { formatInr } from '@/lib/formatCurrency';
 
 interface Props {
   transactions: Transaction[];
@@ -66,7 +67,7 @@ export default function TransactionList({ transactions, title = 'Recent Transact
                       'font-heading font-bold text-sm',
                       tx.type === 'income' ? 'text-income' : 'text-expense'
                     )}>
-                      {tx.type === 'income' ? '+' : '-'}${Number(tx.amount).toFixed(2)}
+                      {tx.type === 'income' ? '+' : '-'}{formatInr(Number(tx.amount))}
                     </span>
                     {showActions && (
                       <div className="flex gap-1">
@@ -93,6 +94,7 @@ export default function TransactionList({ transactions, title = 'Recent Transact
           </DialogHeader>
           {editing && (
             <TransactionForm
+              key={editing.id}
               initial={editing}
               onSubmit={handleUpdate}
               loading={updateMut.isPending}

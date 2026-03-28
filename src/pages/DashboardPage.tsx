@@ -4,7 +4,8 @@ import StatCard from '@/components/StatCard';
 import TransactionList from '@/components/TransactionList';
 import CategoryChart from '@/components/CategoryChart';
 import DashboardAnalytics from '@/components/DashboardAnalytics';
-import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { IndianRupee, TrendingUp, TrendingDown } from 'lucide-react';
+import { formatInr } from '@/lib/formatCurrency';
 import {
   DASHBOARD_PERIOD_LABEL,
   DashboardPeriod,
@@ -56,22 +57,22 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           title="Income"
-          value={`$${totalIncome.toFixed(2)}`}
+          value={formatInr(totalIncome)}
           icon={TrendingUp}
           variant="income"
           subtitle={DASHBOARD_PERIOD_LABEL[period]}
         />
         <StatCard
           title="Expenses"
-          value={`$${totalExpense.toFixed(2)}`}
+          value={formatInr(totalExpense)}
           icon={TrendingDown}
           variant="expense"
           subtitle={DASHBOARD_PERIOD_LABEL[period]}
         />
         <StatCard
           title="Balance"
-          value={`${balance < 0 ? '−' : ''}$${Math.abs(balance).toFixed(2)}`}
-          icon={DollarSign}
+          value={formatInr(balance)}
+          icon={IndianRupee}
           variant="balance"
           subtitle={balance >= 0 ? 'Income minus expenses' : 'Spending above income'}
           valueClassName={balance >= 0 ? 'text-income' : 'text-expense'}

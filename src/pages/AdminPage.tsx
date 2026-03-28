@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import TransactionList from '@/components/TransactionList';
 import StatCard from '@/components/StatCard';
 import CategoryChart from '@/components/CategoryChart';
-import { Users, DollarSign, TrendingUp, TrendingDown, Download, Eye } from 'lucide-react';
+import { Users, IndianRupee, TrendingUp, TrendingDown, Download, Eye } from 'lucide-react';
+import { formatInr } from '@/lib/formatCurrency';
 import { Navigate } from 'react-router-dom';
 import PageLoader from '@/components/PageLoader';
 
@@ -86,9 +87,9 @@ export default function AdminPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <StatCard title="Total Users" value={profiles.length.toString()} icon={Users} />
-        <StatCard title="Total Income" value={`$${totalIncome.toFixed(2)}`} icon={TrendingUp} variant="income" />
-        <StatCard title="Total Expenses" value={`$${totalExpense.toFixed(2)}`} icon={TrendingDown} variant="expense" />
-        <StatCard title="Net Balance" value={`$${(totalIncome - totalExpense).toFixed(2)}`} icon={DollarSign} />
+        <StatCard title="Total Income" value={formatInr(totalIncome)} icon={TrendingUp} variant="income" />
+        <StatCard title="Total Expenses" value={formatInr(totalExpense)} icon={TrendingDown} variant="expense" />
+        <StatCard title="Net Balance" value={formatInr(totalIncome - totalExpense)} icon={IndianRupee} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,20 +16,46 @@ interface TransactionFormProps {
 export default function TransactionForm({ onSubmit, initial, loading, title = 'Add Transaction' }: TransactionFormProps) {
   const [type, setType] = useState(initial?.type || 'expense');
   const [amount, setAmount] = useState(initial?.amount?.toString() || '');
-  const [category, setCategory] = useState(initial?.category || '');
+  const [category, setCategory] = useState(() => (initial?.category ?? '').trim());
   const [date, setDate] = useState(initial?.date || new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState(initial?.description || '');
 
-  const categoriesForType = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  const skipNextTypeClear = useRef(true);
+
+  const categoryOptions = useMemo(() => {
+    const base = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+    const c = category.trim();
+    if (c && !base.includes(c)) return [...base, c];
+    return base;
+  }, [type, category]);
 
   useEffect(() => {
+    if (!initial?.id) return;
+    setType(initial.type);
+    setAmount(initial.amount != null ? String(initial.amount) : '');
+    setCategory((initial.category ?? '').trim());
+    setDate(initial.date || new Date().toISOString().split('T')[0]);
+    setDescription(initial.description ?? '');
+    skipNextTypeClear.current = true;
+  }, [initial?.id]);
+
+  useEffect(() => {
+    if (skipNextTypeClear.current) {
+      skipNextTypeClear.current = false;
+      return;
+    }
     const valid = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
-    setCategory(prev => (prev && !valid.includes(prev) ? '' : prev));
+    setCategory(prev => {
+      const p = prev.trim();
+      if (!p) return prev;
+      return valid.includes(p) ? prev : '';
+    });
   }, [type]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ type, amount: parseFloat(amount), category, date, description });
+    const cat = category.trim();
+    onSubmit({ type, amount: parseFloat(amount), category: cat, date, description: description.trim() || '' });
   };
 
   return (
@@ -60,19 +86,24 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
           <Input
             type="number"
             inputMode="decimal"
-            placeholder="Amount"
+            placeholder="Amount (₹)"
             required
             min="0.01"
             step="0.01"
             value={amount}
             onChange={e => setAmount(e.target.value)}
           />
-          <Select key={type} value={category} onValueChange={setCategory} required>
+          <Select
+            key={`${type}-${initial?.id ?? 'new'}`}
+            value={category || undefined}
+            onValueChange={setCategory}
+            required
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select Category" />
             </SelectTrigger>
             <SelectContent>
-              {categoriesForType.map(c => (
+              {categoryOptions.map(c => (
                 <SelectItem key={c} value={c}>{c}</SelectItem>
               ))}
             </SelectContent>
@@ -87,7 +118,7 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
             value={description}
             onChange={e => setDescription(e.target.value)}
           />
-          <Button type="submit" className="w-full touch-manipulation" disabled={loading || !category}>
+          <Button type="submit" className="w-full touch-manipulation" disabled={loading || !category.trim()}>
             {loading ? 'Saving...' : initial ? 'Update' : 'Add Transaction'}
           </Button>
         </form>
