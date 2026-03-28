@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CATEGORIES, Transaction } from '@/hooks/useTransactions';
+import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, Transaction } from '@/hooks/useTransactions';
 
 interface TransactionFormProps {
   onSubmit: (data: { type: string; amount: number; category: string; date: string; description: string }) => void;
@@ -18,6 +18,13 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
   const [category, setCategory] = useState(initial?.category || '');
   const [date, setDate] = useState(initial?.date || new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState(initial?.description || '');
+
+  const categoriesForType = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+
+  useEffect(() => {
+    const valid = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+    setCategory(prev => (prev && !valid.includes(prev) ? '' : prev));
+  }, [type]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,12 +65,12 @@ export default function TransactionForm({ onSubmit, initial, loading, title = 'A
             value={amount}
             onChange={e => setAmount(e.target.value)}
           />
-          <Select value={category} onValueChange={setCategory} required>
+          <Select key={type} value={category} onValueChange={setCategory} required>
             <SelectTrigger>
               <SelectValue placeholder="Select Category" />
             </SelectTrigger>
             <SelectContent>
-              {CATEGORIES.map(c => (
+              {categoriesForType.map(c => (
                 <SelectItem key={c} value={c}>{c}</SelectItem>
               ))}
             </SelectContent>
