@@ -26,7 +26,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <div className="w-8 h-8 shrink-0 bg-primary rounded-lg flex items-center justify-center">
               <Wallet className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="truncate">ExpenseTracker</span>
+            <span className="truncate">My Wallet</span>
           </Link>
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map(item => (
