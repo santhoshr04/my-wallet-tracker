@@ -68,19 +68,6 @@ export default function HistoryPage() {
         </Button>
       </div>
 
-      {typeFilter === 'all' ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <CategoryChart transactions={filtered} type="expense" />
-          <CategoryChart transactions={filtered} type="income" />
-          <CategoryChart transactions={filtered} type="savings" />
-        </div>
-      ) : (
-        <CategoryChart
-          transactions={filtered}
-          type={typeFilter as 'expense' | 'income' | 'savings'}
-        />
-      )}
-
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="relative sm:col-span-2 lg:col-span-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -105,6 +92,19 @@ export default function HistoryPage() {
         <Input type="date" aria-label="From date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
         <Input type="date" aria-label="To date" value={dateTo} onChange={e => setDateTo(e.target.value)} />
       </div>
+
+      {typeFilter === 'all' ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <CategoryChart transactions={filtered} type="expense" />
+          <CategoryChart transactions={filtered} type="income" />
+          <CategoryChart transactions={filtered} type="savings" />
+        </div>
+      ) : (
+        <CategoryChart
+          transactions={filtered}
+          type={typeFilter as 'expense' | 'income' | 'savings'}
+        />
+      )}
 
       <TransactionList transactions={sortedForList} title={`${sortedForList.length} Transactions`} />
     </div>
