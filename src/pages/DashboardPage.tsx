@@ -4,6 +4,7 @@ import StatCard from '@/components/StatCard';
 import TransactionList from '@/components/TransactionList';
 import CategoryChart from '@/components/CategoryChart';
 import DashboardAnalytics from '@/components/DashboardAnalytics';
+import DebtOverviewCard from '@/components/DebtOverviewCard';
 import { IndianRupee, PiggyBank, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatInr } from '@/lib/formatCurrency';
 import {
@@ -12,6 +13,7 @@ import {
   filterTransactionsByPeriod,
 } from '@/lib/dashboardUtils';
 import { cn } from '@/lib/utils';
+import { timeFromDbToHHMM } from '@/lib/transactionDatetime';
 
 const PERIODS: DashboardPeriod[] = ['month', '30d', 'all'];
 
@@ -27,7 +29,17 @@ export default function DashboardPage() {
   const balance = totalIncome - totalExpense - totalSavings;
 
   const recent = useMemo(() => {
-    return [...filtered].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10);
+    return [...filtered]
+      .sort((a, b) => {
+        const byDate = b.date.localeCompare(a.date);
+        if (byDate !== 0) return byDate;
+        const ta = a.transaction_time ? timeFromDbToHHMM(a.transaction_time) : '00:00';
+        const tb = b.transaction_time ? timeFromDbToHHMM(b.transaction_time) : '00:00';
+        const byTime = tb.localeCompare(ta);
+        if (byTime !== 0) return byTime;
+        return (b.created_at || '').localeCompare(a.created_at || '');
+      })
+      .slice(0, 10);
   }, [filtered]);
 
   if (isLoading) return <div className="flex min-h-[40dvh] items-center justify-center text-muted-foreground">Loading...</div>;
@@ -86,6 +98,8 @@ export default function DashboardPage() {
           valueClassName={balance >= 0 ? 'text-income' : 'text-expense'}
         />
       </div>
+
+      <DebtOverviewCard />
 
       <DashboardAnalytics filteredTransactions={filtered} allTransactions={transactions} period={period} />
 

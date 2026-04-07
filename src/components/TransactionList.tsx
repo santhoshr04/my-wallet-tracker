@@ -7,7 +7,8 @@ import TransactionForm from './TransactionForm';
 import { Pencil, Trash2, ArrowUpCircle, ArrowDownCircle, PiggyBank } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { formatTransactionWhen } from '@/lib/transactionDatetime';
+import { transactionSubtitleForUi, transactionTitleForUi } from '@/lib/transactionDisplay';
 import { formatInr } from '@/lib/formatCurrency';
 
 interface Props {
@@ -58,9 +59,9 @@ export default function TransactionList({ transactions, title = 'Recent Transact
                       <ArrowDownCircle className="w-5 h-5 text-expense shrink-0" />
                     )}
                     <div className="min-w-0">
-                      <p className="font-medium text-sm truncate">{tx.category}</p>
+                      <p className="font-medium text-sm truncate">{transactionTitleForUi(tx)}</p>
                       <p className="text-xs text-muted-foreground truncate">
-                        {tx.description || 'No description'} · {format(new Date(tx.date), 'MMM d, yyyy')}
+                        {transactionSubtitleForUi(tx, formatTransactionWhen(tx.date, tx.transaction_time))}
                       </p>
                     </div>
                   </div>

@@ -11,6 +11,10 @@ export interface Transaction {
   amount: number;
   category: string;
   date: string;
+  /** Postgres TIME as string e.g. "14:30:00" */
+  transaction_time: string | null;
+  debt_id?: string | null;
+  debt_payment_id?: string | null;
   description: string | null;
   created_at: string;
 }
@@ -23,6 +27,7 @@ export const EXPENSE_CATEGORIES = [
   'EMI Payments',
   'Loan Repayment',
   'Debt Payment',
+  'Debt Lent',
   'Taxes',
   'Loan',
   'Food & Dining',
@@ -44,6 +49,8 @@ export const INCOME_CATEGORIES = [
   'Packet money',
   'Freelance',
   'Investment',
+  'Debt Borrowed',
+  'Debt Received',
   'Other Income',
 ];
 
@@ -68,7 +75,13 @@ export function useTransactions(userId?: string) {
   return useQuery({
     queryKey: ['transactions', targetUserId],
     queryFn: async () => {
-      let query = supabase.from('transactions').select('*').order('date', { ascending: false });
+      let query = supabase
+        .from('transactions')
+        .select('*')
+        .order('date', { ascending: false })
+        // Avoid PostgREST order modifiers that can 400 on some versions.
+        .order('transaction_time', { ascending: false })
+        .order('created_at', { ascending: false });
       if (targetUserId) query = query.eq('user_id', targetUserId);
       const { data, error } = await query;
       if (error) throw error;
@@ -83,7 +96,12 @@ export function useAllTransactions() {
   return useQuery({
     queryKey: ['transactions', 'all'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('transactions').select('*').order('date', { ascending: false });
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .order('date', { ascending: false })
+        .order('transaction_time', { ascending: false })
+        .order('created_at', { ascending: false });
       if (error) throw error;
       return data as Transaction[];
     },
@@ -96,7 +114,11 @@ export function useCreateTransaction() {
   const { user } = useAuth();
   return useMutation({
     mutationFn: async (tx: Omit<TransactionInsert, 'user_id'>) => {
-      const { data, error } = await supabase.from('transactions').insert({ ...tx, user_id: user!.id }).select().single();
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert({ ...tx, user_id: user!.id, transaction_time: tx.transaction_time ?? null })
+        .select()
+        .single();
       if (error) throw error;
       return data;
     },

@@ -14,6 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
+      debt_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          debt_id: string
+          id: string
+          note: string | null
+          occurred_date: string
+          occurred_time: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          debt_id: string
+          id?: string
+          note?: string | null
+          occurred_date: string
+          occurred_time: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          debt_id?: string
+          id?: string
+          note?: string | null
+          occurred_date?: string
+          occurred_time?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      debts: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          direction: string
+          due_date: string | null
+          id: string
+          person_name: string
+          remaining_amount: number
+          status: string
+          transaction_date: string
+          transaction_time: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          direction: string
+          due_date?: string | null
+          id?: string
+          person_name: string
+          remaining_amount: number
+          status?: string
+          transaction_date?: string
+          transaction_time?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          direction?: string
+          due_date?: string | null
+          id?: string
+          person_name?: string
+          remaining_amount?: number
+          status?: string
+          transaction_date?: string
+          transaction_time?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -47,8 +128,11 @@ export type Database = {
           category: string
           created_at: string
           date: string
+          debt_id: string | null
+          debt_payment_id: string | null
           description: string | null
           id: string
+          transaction_time: string | null
           type: string
           updated_at: string
           user_id: string
@@ -58,8 +142,11 @@ export type Database = {
           category: string
           created_at?: string
           date?: string
+          debt_id?: string | null
+          debt_payment_id?: string | null
           description?: string | null
           id?: string
+          transaction_time?: string | null
           type: string
           updated_at?: string
           user_id: string
@@ -69,8 +156,11 @@ export type Database = {
           category?: string
           created_at?: string
           date?: string
+          debt_id?: string | null
+          debt_payment_id?: string | null
           description?: string | null
           id?: string
+          transaction_time?: string | null
           type?: string
           updated_at?: string
           user_id?: string

@@ -1,13 +1,11 @@
 import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useCreateTransaction } from '@/hooks/useTransactions';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import TransactionForm from '@/components/TransactionForm';
+import AddEntryForm from '@/components/AddEntryForm';
 import { LayoutDashboard, PlusCircle, List, Shield, LogOut, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -19,14 +17,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
-  const createMut = useCreateTransaction();
-
-  const handleAdd = (data: any) => {
-    createMut.mutate(data, {
-      onSuccess: () => { toast.success('Transaction added!'); setShowAddModal(false); },
-      onError: (e) => toast.error(e.message),
-    });
-  };
 
   return (
     <div className="min-h-dvh flex flex-col overflow-x-hidden">
@@ -139,9 +129,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Add Transaction</DialogTitle>
+            <DialogTitle>Add</DialogTitle>
           </DialogHeader>
-          <TransactionForm onSubmit={handleAdd} loading={createMut.isPending} />
+          <AddEntryForm onDone={() => setShowAddModal(false)} />
         </DialogContent>
       </Dialog>
     </div>
